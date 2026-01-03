@@ -1,6 +1,7 @@
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.12.0
+bcrypt==5.0.0
 certifi==2025.11.12
 click==8.3.1
 dnspython==2.8.0
@@ -20,12 +21,17 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 packaging==25.0
+passlib==1.7.4
 pluggy==1.6.0
+psycopg==3.3.2
+psycopg-binary==3.3.2
+psycopg2-binary==2.9.11
 pydantic==2.12.5
 pydantic-extra-types==2.11.0
 pydantic-settings==2.12.0
 pydantic_core==2.41.5
 Pygments==2.19.2
+PyJWT==2.10.1
 pytest==9.0.2
 python-dotenv==1.2.1
 python-multipart==0.0.21
@@ -35,6 +41,7 @@ rich-toolkit==0.17.1
 rignore==0.7.6
 sentry-sdk==2.48.0
 shellingham==1.5.4
+SQLAlchemy==2.0.45
 starlette==0.50.0
 typer==0.21.0
 typing-inspection==0.4.2

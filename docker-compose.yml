@@ -1,0 +1,23 @@
+services:
+  task_manager_db:
+    image: postgres:16.11-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - task_manager_db_data:/var/lib/postgresql/data
+
+  task_manager_test_db:
+    image: postgres:16.11-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_TEST_DB}
+    ports:
+      - "${TEST_POSTGRES_PORT}:5432"
+
+volumes:
+  task_manager_db_data:
