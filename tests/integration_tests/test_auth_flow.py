@@ -36,3 +36,19 @@ class TestAuthFlow:
         response = client.post("/auth/login", json=request_body)
         assert response.status_code == 404
         assert response.json()['detail'] == "User not found"
+
+    def test_login_when_password_mismatch(self, client):
+        request_body = {
+            "username": "user1",
+            "email": "example@gmail.com",
+            "password": "password",
+        }
+        client.post("/auth/sign-up", json=request_body)
+
+        request_body = {
+            "email": "example@gmail.com",
+            "password": "dummy_password"
+        }
+        response = client.post("/auth/login", json=request_body)
+        assert response.status_code == 404
+        assert response.json()['detail'] == "password mismatch"

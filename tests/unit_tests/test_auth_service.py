@@ -72,3 +72,21 @@ def test_login_when_user_not_found():
         service.login(payload=LoginRequest(email="dummy@email.com", password="password"))
 
         mock_repository.get_user_by_email.assert_called_once()
+
+
+@patch('app.service.auth_service.verify_password')
+def test_login_when_password_mismatch(mock_verify_password):
+    with pytest.raises(HTTPException) as e:
+        mock_repository = Mock()
+        mock_repository.get_user_by_email.return_value = User(
+            id=1,
+            username="username",
+            email="user@gmail.com",
+            hashed_password="hashed-password",
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+        mock_verify_password.return_value = False
+
+        service = AuthService(mock_repository)
+        service.login(payload=LoginRequest(email="user@gmail.com", password="dummy-password"))
