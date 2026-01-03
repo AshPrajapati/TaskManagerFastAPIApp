@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
+import pytest
+from starlette.exceptions import HTTPException
+
 from app.core.config import settings
 from app.models.model import User
 from app.schema.schema import SignupRequest, TokenResponse, LoginRequest
@@ -58,3 +61,14 @@ def test_login(mock_verify_password, mock_create_access_token):
     mock_verify_password.assert_called_once_with("password", "hashed-password")
     mock_create_access_token.assert_called_once_with(data={"sub": 1},
                                                      expires_delta=timedelta(settings.TOKEN_EXPIRES))
+
+
+def test_login_when_user_not_found():
+    with pytest.raises(HTTPException) as e:
+        mock_repository = Mock()
+        mock_repository.get_user_by_email.return_value = None
+
+        service = AuthService(mock_repository)
+        service.login(payload=LoginRequest(email="dummy@email.com", password="password"))
+
+        mock_repository.get_user_by_email.assert_called_once()
