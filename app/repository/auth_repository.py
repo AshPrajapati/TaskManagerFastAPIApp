@@ -12,3 +12,6 @@ class AuthRepository:
         self.db.commit()
         self.db.refresh(user)
         return user
+
+    def get_user_by_email(self, email: str):
+        return self.db.query(User).filter(User.email == email).first()

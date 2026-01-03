@@ -10,3 +10,20 @@ class TestAuthFlow:
         assert resp.status_code == 200
         assert resp.json()['token_type'] == "bearer"
         assert resp.json()['access_token'] is not None
+
+    def test_login(self, client):
+        request_body = {
+            "username": "user1",
+            "email": "example@gmail.com",
+            "password": "password",
+        }
+        client.post("/auth/sign-up", json=request_body)
+
+        request_body = {
+            "email": "example@gmail.com",
+            "password": "password"
+        }
+        response = client.post("/auth/login", json=request_body)
+        assert response.status_code == 200
+        assert response.json()['token_type'] == "bearer"
+        assert response.json()['access_token'] is not None
