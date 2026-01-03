@@ -14,6 +14,7 @@ from app.service.auth_service import AuthService
 @patch('app.service.auth_service.create_access_token')
 def test_signup(mock_create_access_token, mock_hash_password):
     mock_repository = Mock()
+    mock_repository.get_user_by_email.return_value = None
     mock_repository.create_user.return_value = User(
         id=1,
         username="username",
@@ -36,6 +37,28 @@ def test_signup(mock_create_access_token, mock_hash_password):
     mock_hash_password.assert_called_once_with("password")
     mock_create_access_token.assert_called_once_with(data={"sub": 1},
                                                      expires_delta=timedelta(settings.TOKEN_EXPIRES))
+
+
+def test_signup_when_user_already_with_email():
+    mock_repository = Mock()
+    mock_repository.get_user_by_email.return_value = User(
+        id=1,
+        username="user1",
+        email="email@gmail.com",
+        hashed_password="hashed-password",
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+    )
+
+    service = AuthService(mock_repository)
+
+    with pytest.raises(HTTPException) as e:
+        service.signup(payload=SignupRequest(username="user2", email="email@gmail.com", password="new-password"))
+
+    assert e.value.status_code == 400
+    assert e.value.detail == "User already exists with same email"
+    mock_repository.get_user_by_email.assert_called_once()
+    assert mock_repository.create_user.call_count == 0
 
 
 @patch('app.service.auth_service.create_access_token')

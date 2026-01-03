@@ -11,6 +11,23 @@ class TestAuthFlow:
         assert resp.json()['token_type'] == "bearer"
         assert resp.json()['access_token'] is not None
 
+    def test_sign_up_when_user_already_exists_with_email(self, client):
+        request_body = {
+            "username": "user1",
+            "email": "example@gmail.com",
+            "password": "password",
+        }
+        client.post("/auth/sign-up", json=request_body)
+
+        request_body = {
+            "username": "user2",
+            "email": "example@gmail.com",
+            "password": "new-password",
+        }
+        response = client.post("/auth/sign-up", json=request_body)
+        assert response.status_code == 400
+        assert response.json()['detail'] == "User already exists with same email"
+
     def test_login(self, client):
         request_body = {
             "username": "user1",

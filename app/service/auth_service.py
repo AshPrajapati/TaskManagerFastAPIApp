@@ -19,6 +19,10 @@ class AuthService:
         self.repository = repository
 
     def signup(self, payload: SignupRequest):
+        user_by_email = self.repository.get_user_by_email(payload.email)
+        if user_by_email:
+            raise HTTPException(status_code=400, detail="User already exists with same email")
+
         user = User(
             email=payload.email,
             username=payload.username,
