@@ -15,3 +15,18 @@ class TokenResponse(BaseModel):
 class LoginRequest(BaseModel):
     email: str
     password: str
+
+
+class CreateTaskRequest(BaseModel):
+    title: str
+    description: str
+    status: str
+    priority: str
+
+
+class TaskResponse(BaseModel):
+    task_id: int
+    title: str
+    description: str
+    status: str
+    priority: str

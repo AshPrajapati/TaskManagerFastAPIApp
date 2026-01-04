@@ -5,6 +5,8 @@ from fastapi.testclient import TestClient
 
 from app.core.database import get_engine, Base, get_db
 from app.main import app
+from app.models.model import User
+from tests.utils.auth import get_test_token
 
 
 # ---------- ENGINE ----------
@@ -21,6 +23,7 @@ def test_engine():
 @pytest.fixture(scope="session", autouse=True)
 def create_test_tables(test_engine):
     from app.models.model import User
+    from app.models.model import Task
     Base.metadata.create_all(bind=test_engine)
     yield
     Base.metadata.drop_all(bind=test_engine)
@@ -61,3 +64,23 @@ def client(db_session):
         yield client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def get_test_user(db_session):
+    user = User(email="testuser@gmail.com",
+                username="testuser",
+                hashed_password="hashed-password")
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+    return user
+
+
+@pytest.fixture
+def authenticated_client(client: TestClient, get_test_user):
+    test_token = get_test_token(get_test_user.id)
+    client.headers.update(
+        {"Authorization": f"Bearer {test_token}"}
+    )
+    return client
