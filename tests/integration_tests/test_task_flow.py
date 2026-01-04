@@ -29,3 +29,9 @@ class TestTaskFlow:
         body = response.json()
         assert body["task_id"] == 1
         assert body["title"] == "task1"
+
+    def test_get_task_by_id_not_found(self, authenticated_client: TestClient, seeded_tasks):
+        response = authenticated_client.get("/tasks/999")
+
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Task not found"

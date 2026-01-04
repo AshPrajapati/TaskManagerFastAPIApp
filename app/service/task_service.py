@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from app.repository.task_reposirtoy import TaskRepository
 from app.schema.schema import TaskResponse, CreateTaskRequest
 
@@ -15,4 +17,7 @@ class TaskService:
         return [TaskResponse.model_validate(task) for task in tasks]
 
     def get_task_by_id(self, task_id, user_id):
-        return self.repository.get_task_by_id(task_id, user_id)
+        task = self.repository.get_task_by_id(task_id, user_id)
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return task
