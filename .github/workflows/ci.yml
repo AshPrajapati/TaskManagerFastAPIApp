@@ -1,9 +1,9 @@
-name: ci.yml
+name: ci
 
 on:
   push:
     branches:
-      - *
+      - "*"
 
 
 jobs:
