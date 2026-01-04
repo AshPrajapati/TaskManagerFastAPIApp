@@ -10,14 +10,15 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     env:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpassword
-      POSTGRES_DB: testdb
-      POSTGRES_PORT: 5432
-      POSTGRES_TEST_DB: testdb_test
-      TEST_POSTGRES_PORT: 5433
-      SECRET_KEY: supersecret
-      TOKEN_EXPIRES: 30
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      POSTGRES_TEST_DB: ${{ secrets.POSTGRES_TEST_DB }}
+      TEST_POSTGRES_PORT: ${{ secrets.TEST_POSTGRES_PORT }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      TOKEN_EXPIRES: ${{ secrets.TOKEN_EXPIRES }}
+      ALGORITHM: ${{secrets.ALGORITHM}}
     steps:
       - uses: actions/checkout@v4
 
