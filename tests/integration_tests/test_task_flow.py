@@ -23,15 +23,16 @@ class TestTaskFlow:
         assert len(response.json()) == 2
 
     def test_get_task_by_id(self, authenticated_client: TestClient, seeded_tasks):
-        response = authenticated_client.get("/tasks/1")
+        task_id = seeded_tasks[0]
+        response = authenticated_client.get(f"/tasks/{task_id}")
 
         assert response.status_code == 200
         body = response.json()
-        assert body["task_id"] == 1
+        assert body["task_id"] == task_id
         assert body["title"] == "task1"
 
     def test_get_task_by_id_not_found(self, authenticated_client: TestClient, seeded_tasks):
-        response = authenticated_client.get("/tasks/999")
+        response = authenticated_client.get("/tasks/9999")
 
         assert response.status_code == 404
         assert response.json()["detail"] == "Task not found"
@@ -42,7 +43,8 @@ class TestTaskFlow:
             "priority": "high",
             "status": "in_progress",
         }
-        response = authenticated_client.put("/tasks/1", json=request_body)
+        task_id = seeded_tasks[0]
+        response = authenticated_client.put(f"/tasks/{task_id}", json=request_body)
         assert response.status_code == 200
         assert response.json()["title"] == "updated_task"
         assert response.json()["priority"] == "high"
@@ -54,14 +56,20 @@ class TestTaskFlow:
             "priority": "high",
             "status": "in_progress",
         }
-        response = authenticated_client.put("/tasks/999", json=request_body)
+        response = authenticated_client.put("/tasks/9999", json=request_body)
         assert response.status_code == 404
         assert response.json()["detail"] == "Task not found"
 
     def test_delete_task(self, authenticated_client: TestClient, seeded_tasks):
-        response = authenticated_client.delete("/tasks/1")
+        task_id = seeded_tasks[0]
+        response = authenticated_client.delete(f"/tasks/{task_id}")
         assert response.status_code == 204
 
-        task_response= authenticated_client.get("/tasks/1")
+        task_response = authenticated_client.get(f"/tasks/{task_id}")
         assert task_response.status_code == 404
         assert task_response.json()["detail"] == "Task not found"
+
+    def test_delete_task_not_found(self, authenticated_client: TestClient, seeded_tasks):
+        response = authenticated_client.delete("/tasks/9999")
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Task not found to delete"

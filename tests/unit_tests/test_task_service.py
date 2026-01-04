@@ -146,3 +146,16 @@ def test_delete_task():
     service.delete_task(1, 1)
     mock_repo.get_task_by_id.assert_called_once_with(1, 1)
     mock_repo.delete_task.assert_called_once_with(task)
+
+
+def test_delete_task_not_found():
+    mock_repo = Mock()
+    mock_repo.get_task_by_id.return_value = None
+
+    service = TaskService(repository=mock_repo)
+    with pytest.raises(HTTPException) as e:
+        service.delete_task(1, 1)
+
+    assert e.value.status_code == 404
+    assert e.value.detail == "Task not found to delete"
+    mock_repo.get_task_by_id.assert_called_once_with(1, 1)

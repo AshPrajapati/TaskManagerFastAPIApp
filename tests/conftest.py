@@ -88,22 +88,17 @@ def authenticated_client(client: TestClient, get_test_user):
 
 @pytest.fixture
 def seeded_tasks(authenticated_client):
-    authenticated_client.post(
-        "/tasks",
-        json={
-            "title": "task1",
-            "description": "desc1",
-            "status": "pending",
-            "priority": "low",
-        },
-    )
+    task_one_response = authenticated_client.post("/tasks",
+                                                  json={"title": "task1",
+                                                        "description": "desc1",
+                                                        "status": "pending",
+                                                        "priority": "low", }
+                                                  )
 
-    authenticated_client.post(
-        "/tasks",
-        json={
-            "title": "task2",
-            "description": "desc2",
-            "status": "pending",
-            "priority": "high",
-        },
-    )
+    task_two_response = authenticated_client.post("/tasks",
+                                                  json={"title": "task2",
+                                                        "description": "desc2",
+                                                        "status": "pending",
+                                                        "priority": "high", }
+                                                  )
+    return [task_one_response.json()["task_id"], task_two_response.json()["task_id"]]

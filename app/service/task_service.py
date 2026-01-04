@@ -34,4 +34,6 @@ class TaskService:
 
     def delete_task(self, task_id, user_id):
         task = self.repository.get_task_by_id(task_id, user_id)
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found to delete")
         self.repository.delete_task(task)
