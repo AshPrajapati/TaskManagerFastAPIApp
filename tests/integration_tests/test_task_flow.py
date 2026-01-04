@@ -21,3 +21,11 @@ class TestTaskFlow:
         assert response.status_code == 200
         assert response.json() is not None
         assert len(response.json()) == 2
+
+    def test_get_task_by_id(self, authenticated_client: TestClient, seeded_tasks):
+        response = authenticated_client.get("/tasks/1")
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["task_id"] == 1
+        assert body["title"] == "task1"

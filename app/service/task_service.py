@@ -13,3 +13,6 @@ class TaskService:
     def get_all_tasks(self, user_id):
         tasks = self.repository.get_all_tasks(user_id)
         return [TaskResponse.model_validate(task) for task in tasks]
+
+    def get_task_by_id(self, task_id, user_id):
+        return self.repository.get_task_by_id(task_id, user_id)

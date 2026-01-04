@@ -18,3 +18,6 @@ class TaskRepository:
 
     def get_all_tasks(self, user_id):
         return self.db.query(Task).filter(Task.user_id == user_id).all()
+
+    def get_task_by_id(self, task_id, user_id):
+        return self.db.query(Task).filter(Task.id == task_id, Task.user_id == user_id).first()

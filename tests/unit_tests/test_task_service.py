@@ -54,3 +54,23 @@ def test_get_all_tasks():
 
     assert len(tasks) == 1
     mock_repo.get_all_tasks.assert_called_once()
+
+
+def test_get_task_by_id():
+    mock_repo = Mock()
+    mock_repo.get_task_by_id.return_value = Task(
+        id=1,
+        title="Test",
+        description="Desc",
+        status="pending",
+        priority="low",
+        user_id=1,
+        created_at=datetime.datetime.now(),
+        updated_at=datetime.datetime.now(),
+    )
+
+    service = TaskService(repository=mock_repo)
+    task = service.get_task_by_id(1, 1)
+
+    assert task.id == 1
+    mock_repo.get_task_by_id.assert_called_once()

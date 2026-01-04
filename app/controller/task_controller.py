@@ -34,3 +34,10 @@ def create_task(create_task_request: CreateTaskRequest,
 def get_all_tasks(service: TaskService = Depends(get_task_service), user: User = Depends(get_current_user)):
     tasks = service.get_all_tasks(user.id)
     return tasks
+
+
+@task_router.get("/{task_id}", response_model=TaskResponse)
+def get_task_by_id(task_id: int, service: TaskService = Depends(get_task_service),
+                   user: User = Depends(get_current_user)):
+    task = service.get_task_by_id(task_id, user.id)
+    return task
