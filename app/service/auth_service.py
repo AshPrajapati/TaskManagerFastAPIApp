@@ -8,11 +8,7 @@ from app.core.config import settings
 from app.core.security import hash_password, create_access_token, verify_password
 from app.models.model import User
 from app.repository.auth_repository import AuthRepository
-from app.schema.schema import SignupRequest, TokenResponse, LoginRequest
-
-
-def get_auth_repository() -> AuthRepository:
-    return AuthRepository()
+from app.schema.schema import SignupRequest, TokenResponse
 
 
 class AuthService:
@@ -35,7 +31,8 @@ class AuthService:
         return TokenResponse(access_token=access_token, token_type="bearer")
 
     def login(self, form_data: OAuth2PasswordRequestForm):
-        user: User = self.repository.get_user_by_email(form_data.username)
+        email = form_data.username
+        user: User = self.repository.get_user_by_email(email)
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         if not verify_password(form_data.password, user.hashed_password):
