@@ -33,7 +33,7 @@ jobs:
           pip install -r requirement.txt
 
       - name: Run unit tests
-        run: pytest tests/unit_tests -v
+        run: pytest tests/unit_tests --cov=app -v
 
   integration-tests:
     runs-on: ubuntu-latest
