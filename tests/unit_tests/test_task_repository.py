@@ -2,7 +2,7 @@ import datetime
 from unittest.mock import Mock
 
 from app.models.model import Task
-from app.repository.task_reposirtoy import TaskRepository
+from app.repository.task_repository import TaskRepository
 from app.schema.schema import CreateTaskRequest
 
 
@@ -88,3 +88,17 @@ def test_save_task():
     mock_db.add.assert_called_once()
     mock_db.commit.assert_called_once()
     mock_db.refresh.assert_called_once()
+
+
+def test_delete_task():
+    mock_db = Mock()
+    repository = TaskRepository(mock_db)
+    task = Task(id=1,
+                title="title1",
+                description="description",
+                status="pending",
+                priority="low",
+                user_id=1)
+    repository.delete_task(task)
+    mock_db.delete.assert_called_once_with(task)
+    mock_db.commit.assert_called_once()

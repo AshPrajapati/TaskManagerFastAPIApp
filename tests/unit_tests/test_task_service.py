@@ -134,3 +134,15 @@ def test_update_task_not_found():
 
     assert e.value.status_code == 404
     assert e.value.detail == "Task not found"
+
+
+def test_delete_task():
+    mock_repo = Mock()
+    task = Task(id=1, title="Test", description="Desc", status="pending", priority="low", user_id=1,
+                created_at=datetime.datetime.now(), updated_at=datetime.datetime.now(), )
+    mock_repo.get_task_by_id.return_value = task
+
+    service = TaskService(repository=mock_repo)
+    service.delete_task(1, 1)
+    mock_repo.get_task_by_id.assert_called_once_with(1, 1)
+    mock_repo.delete_task.assert_called_once_with(task)

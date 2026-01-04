@@ -3,11 +3,12 @@ from typing import List
 from fastapi import APIRouter
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
+from starlette import status
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.model import User
-from app.repository.task_reposirtoy import TaskRepository
+from app.repository.task_repository import TaskRepository
 from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest
 from app.service.task_service import TaskService
 
@@ -48,3 +49,10 @@ def update_task(task_id: int, payload: UpdateTaskRequest, service: TaskService =
                 user: User = Depends(get_current_user)):
     task = service.update_task(task_id, payload, user.id)
     return task
+
+
+@task_router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(task_id: int,
+                service: TaskService = Depends(get_task_service),
+                user: User = Depends(get_current_user)):
+    service.delete_task(task_id, user.id)

@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.repository.task_reposirtoy import TaskRepository
+from app.repository.task_repository import TaskRepository
 from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest
 
 
@@ -31,3 +31,7 @@ class TaskService:
             setattr(task, key, value)
         saved_task = self.repository.save_task(task)
         return TaskResponse.model_validate(saved_task)
+
+    def delete_task(self, task_id, user_id):
+        task = self.repository.get_task_by_id(task_id, user_id)
+        self.repository.delete_task(task)

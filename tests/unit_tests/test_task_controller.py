@@ -106,6 +106,18 @@ def test_update_task():
     client.headers.update({"Authorization": f"Bearer access_token"})
     response = client.put("/tasks/1", json={"title": "updated_title", "priority": "high"})
     assert response.status_code == 200
+    app.dependency_overrides.clear()
+
+
+def test_delete_task():
+    mock_service = Mock()
+
+    setup_dependency_overrides(mock_service)
+    client = TestClient(app)
+    client.headers.update({"Authorization": f"Bearer access_token"})
+    response = client.delete("/tasks/1")
+    assert response.status_code == 204
+    app.dependency_overrides.clear()
 
 
 def setup_dependency_overrides(mock_service: Mock):

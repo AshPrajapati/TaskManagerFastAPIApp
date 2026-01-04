@@ -57,3 +57,11 @@ class TestTaskFlow:
         response = authenticated_client.put("/tasks/999", json=request_body)
         assert response.status_code == 404
         assert response.json()["detail"] == "Task not found"
+
+    def test_delete_task(self, authenticated_client: TestClient, seeded_tasks):
+        response = authenticated_client.delete("/tasks/1")
+        assert response.status_code == 204
+
+        task_response= authenticated_client.get("/tasks/1")
+        assert task_response.status_code == 404
+        assert task_response.json()["detail"] == "Task not found"
