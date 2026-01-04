@@ -24,6 +24,8 @@ class TaskService:
 
     def update_task(self, task_id: int, payload: UpdateTaskRequest, user_id: int):
         task = self.repository.get_task_by_id(task_id, user_id)
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
         update_task = payload.model_dump(exclude_unset=True)
         for key, value in update_task.items():
             setattr(task, key, value)
