@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from fastapi import HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
 from app.core.config import settings
@@ -29,17 +30,17 @@ class AuthService:
             hashed_password=hash_password(payload.password)
         )
         saved_user = self.repository.create_user(user)
-        access_token = create_access_token(data={"sub": saved_user.id},
+        access_token = create_access_token(data={"sub": str(saved_user.id)},
                                            expires_delta=timedelta(settings.TOKEN_EXPIRES))
         return TokenResponse(access_token=access_token, token_type="bearer")
 
-    def login(self, payload: LoginRequest):
-        user: User = self.repository.get_user_by_email(payload.email)
+    def login(self, form_data: OAuth2PasswordRequestForm):
+        user: User = self.repository.get_user_by_email(form_data.username)
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-        if not verify_password(payload.password, user.hashed_password):
+        if not verify_password(form_data.password, user.hashed_password):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="password mismatch")
 
-        access_token = create_access_token(data={"sub": user.id},
+        access_token = create_access_token(data={"sub": str(user.id)},
                                            expires_delta=timedelta(settings.TOKEN_EXPIRES))
         return TokenResponse(access_token=access_token, token_type="bearer")

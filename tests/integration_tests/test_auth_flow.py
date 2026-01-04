@@ -37,20 +37,20 @@ class TestAuthFlow:
         client.post("/auth/sign-up", json=request_body)
 
         request_body = {
-            "email": "example@gmail.com",
+            "username": "example@gmail.com",
             "password": "password"
         }
-        response = client.post("/auth/login", json=request_body)
+        response = client.post("/auth/login", data=request_body)
         assert response.status_code == 200
         assert response.json()['token_type'] == "bearer"
         assert response.json()['access_token'] is not None
 
     def test_login_when_user_not_found(self, client):
         request_body = {
-            "email": "dummy@gmail.com",
+            "username": "dummy@gmail.com",
             "password": "password"
         }
-        response = client.post("/auth/login", json=request_body)
+        response = client.post("/auth/login", data=request_body)
         assert response.status_code == 404
         assert response.json()['detail'] == "User not found"
 
@@ -63,9 +63,9 @@ class TestAuthFlow:
         client.post("/auth/sign-up", json=request_body)
 
         request_body = {
-            "email": "example@gmail.com",
+            "username": "example@gmail.com",
             "password": "dummy_password"
         }
-        response = client.post("/auth/login", json=request_body)
+        response = client.post("/auth/login", data=request_body)
         assert response.status_code == 404
         assert response.json()['detail'] == "password mismatch"

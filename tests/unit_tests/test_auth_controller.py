@@ -51,8 +51,8 @@ def test_login():
     test_client = TestClient(app)
     response = test_client.post(
         "/auth/login",
-        json={
-            "email": EMAIL,
+        data={
+            "username": EMAIL,
             "password": PASSWORD
         }
     )

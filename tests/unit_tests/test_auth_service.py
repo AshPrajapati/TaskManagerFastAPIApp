@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 import pytest
+from fastapi.security import OAuth2PasswordRequestForm
 from starlette.exceptions import HTTPException
 
 from app.core.config import settings
@@ -77,7 +78,7 @@ def test_login(mock_verify_password, mock_create_access_token):
     mock_create_access_token.return_value = "encoded-token"
 
     service = AuthService(mock_repository)
-    token_response = service.login(LoginRequest(email="email@email.com", password="password"))
+    token_response = service.login(OAuth2PasswordRequestForm(username="email@email.com", password="password"))
     assert token_response is not None
     assert token_response.token_type == "bearer"
     mock_repository.get_user_by_email.assert_called_once()
@@ -92,7 +93,7 @@ def test_login_when_user_not_found():
         mock_repository.get_user_by_email.return_value = None
 
         service = AuthService(mock_repository)
-        service.login(payload=LoginRequest(email="dummy@email.com", password="password"))
+        service.login(form_data=OAuth2PasswordRequestForm(username="dummy@email.com", password="password"))
 
         mock_repository.get_user_by_email.assert_called_once()
 
@@ -112,4 +113,4 @@ def test_login_when_password_mismatch(mock_verify_password):
         mock_verify_password.return_value = False
 
         service = AuthService(mock_repository)
-        service.login(payload=LoginRequest(email="user@gmail.com", password="dummy-password"))
+        service.login(form_data=OAuth2PasswordRequestForm(username="user@gmail.com", password="dummy-password"))
