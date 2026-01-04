@@ -8,10 +8,8 @@ class TaskService:
 
     def create_task(self, create_task_request: CreateTaskRequest, user_id) -> TaskResponse:
         task = self.repository.create_task(create_task_request, user_id)
-        return TaskResponse(
-            task_id=task.id,
-            title=task.title,
-            description=task.description,
-            status=task.status,
-            priority=task.priority
-        )
+        return TaskResponse.model_validate(task)
+
+    def get_all_tasks(self, user_id):
+        tasks = self.repository.get_all_tasks(user_id)
+        return [TaskResponse.model_validate(task) for task in tasks]

@@ -15,3 +15,9 @@ class TestTaskFlow:
         assert response.json()["description"] == "task1 description"
         assert response.json()["status"] == "pending"
         assert response.json()["priority"] == "low"
+
+    def test_get_all_tasks(self, authenticated_client: TestClient, seeded_tasks):
+        response = authenticated_client.get("/tasks")
+        assert response.status_code == 200
+        assert response.json() is not None
+        assert len(response.json()) == 2

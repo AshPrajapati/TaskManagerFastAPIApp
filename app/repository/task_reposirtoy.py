@@ -15,3 +15,6 @@ class TaskRepository:
         self.db.commit()
         self.db.refresh(task)
         return task
+
+    def get_all_tasks(self, user_id):
+        return self.db.query(Task).filter(Task.user_id == user_id).all()

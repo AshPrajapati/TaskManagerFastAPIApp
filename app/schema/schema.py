@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SignupRequest(BaseModel):
@@ -25,8 +25,12 @@ class CreateTaskRequest(BaseModel):
 
 
 class TaskResponse(BaseModel):
-    task_id: int
+    task_id: int = Field(validation_alias="id")
     title: str
     description: str
     status: str
     priority: str
+
+    class Config:
+        from_attributes = True
+        populate_by_name = True

@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
@@ -26,3 +28,9 @@ def create_task(create_task_request: CreateTaskRequest,
                 user: User = Depends(get_current_user)):
     task = service.create_task(create_task_request, user.id)
     return task
+
+
+@task_router.get("/", response_model=List[TaskResponse])
+def get_all_tasks(service: TaskService = Depends(get_task_service), user: User = Depends(get_current_user)):
+    tasks = service.get_all_tasks(user.id)
+    return tasks

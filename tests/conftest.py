@@ -84,3 +84,26 @@ def authenticated_client(client: TestClient, get_test_user):
         {"Authorization": f"Bearer {test_token}"}
     )
     return client
+
+
+@pytest.fixture
+def seeded_tasks(authenticated_client):
+    authenticated_client.post(
+        "/tasks",
+        json={
+            "title": "task1",
+            "description": "desc1",
+            "status": "pending",
+            "priority": "low",
+        },
+    )
+
+    authenticated_client.post(
+        "/tasks",
+        json={
+            "title": "task2",
+            "description": "desc2",
+            "status": "pending",
+            "priority": "high",
+        },
+    )
