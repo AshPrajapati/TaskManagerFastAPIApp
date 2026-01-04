@@ -9,7 +9,15 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
-
+    env:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: testdb
+      POSTGRES_PORT: 5432
+      POSTGRES_TEST_DB: testdb_test
+      TEST_POSTGRES_PORT: 5433
+      SECRET_KEY: supersecret
+      TOKEN_EXPIRES: 30
     steps:
       - uses: actions/checkout@v4
 
