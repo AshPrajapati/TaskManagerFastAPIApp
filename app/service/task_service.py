@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
 from app.repository.task_reposirtoy import TaskRepository
-from app.schema.schema import TaskResponse, CreateTaskRequest
+from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest
 
 
 class TaskService:
@@ -21,3 +21,11 @@ class TaskService:
         if task is None:
             raise HTTPException(status_code=404, detail="Task not found")
         return task
+
+    def update_task(self, task_id: int, payload: UpdateTaskRequest, user_id: int):
+        task = self.repository.get_task_by_id(task_id, user_id)
+        update_task = payload.model_dump(exclude_unset=True)
+        for key, value in update_task.items():
+            setattr(task, key, value)
+        saved_task = self.repository.save_task(task)
+        return TaskResponse.model_validate(saved_task)

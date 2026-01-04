@@ -34,3 +34,10 @@ class TaskResponse(BaseModel):
     class Config:
         from_attributes = True
         populate_by_name = True
+
+
+class UpdateTaskRequest(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    status: str | None = None
+    priority: str | None = None

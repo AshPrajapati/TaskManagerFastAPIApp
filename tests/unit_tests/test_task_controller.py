@@ -16,15 +16,7 @@ def test_create_task():
                                                          status="pending",
                                                          priority="low")
 
-    def get_override_task_service():
-        return mock_service
-
-    def get_override_current_user():
-        return Mock(id=1)
-
-    app.dependency_overrides[get_task_service] = get_override_task_service
-    app.dependency_overrides[get_current_user] = get_override_current_user
-
+    setup_dependency_overrides(mock_service)
     client = TestClient(app)
     create_task_request = CreateTaskRequest(title="title",
                                             description="description",
@@ -60,14 +52,7 @@ def test_get_all_tasks():
         )
     ]
 
-    def get_override_task_service():
-        return mock_service
-
-    def get_override_current_user():
-        return Mock(id=1)
-
-    app.dependency_overrides[get_task_service] = get_override_task_service
-    app.dependency_overrides[get_current_user] = get_override_current_user
+    setup_dependency_overrides(mock_service)
     client = TestClient(app)
     client.headers.update({"Authorization": f"Bearer access_token"})
 
@@ -89,14 +74,7 @@ def test_get_by_id():
         priority="low"
     )
 
-    def get_override_task_service():
-        return mock_service
-
-    def get_override_current_user():
-        return Mock(id=1)
-
-    app.dependency_overrides[get_task_service] = get_override_task_service
-    app.dependency_overrides[get_current_user] = get_override_current_user
+    setup_dependency_overrides(mock_service)
     client = TestClient(app)
     client.headers.update({"Authorization": f"Bearer access_token"})
 
@@ -111,3 +89,31 @@ def test_get_by_id():
     }
     mock_service.get_task_by_id.assert_called_once_with(1, 1)
     app.dependency_overrides.clear()
+
+
+def test_update_task():
+    mock_service = Mock()
+    mock_service.update_task.return_value = TaskResponse(
+        task_id=1,
+        title="updated_title",
+        description="description",
+        status="pending",
+        priority="high"
+    )
+
+    setup_dependency_overrides(mock_service)
+    client = TestClient(app)
+    client.headers.update({"Authorization": f"Bearer access_token"})
+    response = client.put("/tasks/1", json={"title": "updated_title", "priority": "high"})
+    assert response.status_code == 200
+
+
+def setup_dependency_overrides(mock_service: Mock):
+    def get_override_task_service():
+        return mock_service
+
+    def get_override_current_user():
+        return Mock(id=1)
+
+    app.dependency_overrides[get_task_service] = get_override_task_service
+    app.dependency_overrides[get_current_user] = get_override_current_user

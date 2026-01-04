@@ -35,3 +35,15 @@ class TestTaskFlow:
 
         assert response.status_code == 404
         assert response.json()["detail"] == "Task not found"
+
+    def test_update_task(self, authenticated_client: TestClient, seeded_tasks):
+        request_body = {
+            "title": "updated_task",
+            "priority": "high",
+            "status": "in_progress",
+        }
+        response = authenticated_client.put("/tasks/1", json=request_body)
+        assert response.status_code == 200
+        assert response.json()["title"] == "updated_task"
+        assert response.json()["priority"] == "high"
+        assert response.json()["status"] == "in_progress"

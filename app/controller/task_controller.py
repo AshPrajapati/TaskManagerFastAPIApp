@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.model import User
 from app.repository.task_reposirtoy import TaskRepository
-from app.schema.schema import TaskResponse, CreateTaskRequest
+from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest
 from app.service.task_service import TaskService
 
 task_router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -40,4 +40,11 @@ def get_all_tasks(service: TaskService = Depends(get_task_service), user: User =
 def get_task_by_id(task_id: int, service: TaskService = Depends(get_task_service),
                    user: User = Depends(get_current_user)):
     task = service.get_task_by_id(task_id, user.id)
+    return task
+
+
+@task_router.put("/{task_id}", response_model=TaskResponse)
+def update_task(task_id: int, payload: UpdateTaskRequest, service: TaskService = Depends(get_task_service),
+                user: User = Depends(get_current_user)):
+    task = service.update_task(task_id, payload, user.id)
     return task

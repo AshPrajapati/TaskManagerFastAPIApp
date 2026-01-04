@@ -21,3 +21,9 @@ class TaskRepository:
 
     def get_task_by_id(self, task_id, user_id):
         return self.db.query(Task).filter(Task.id == task_id, Task.user_id == user_id).first()
+
+    def save_task(self, task):
+        self.db.add(task)
+        self.db.commit()
+        self.db.refresh(task)
+        return task

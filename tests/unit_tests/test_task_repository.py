@@ -52,6 +52,7 @@ def test_get_all_tasks():
     assert len(tasks) == 2
     mock_db.query.return_value.filter.return_value.all.assert_called_once()
 
+
 def test_get_task_by_id():
     mock_db = Mock()
     mock_db.query.return_value.filter.return_value.first.return_value = Task(
@@ -71,3 +72,19 @@ def test_get_task_by_id():
     assert task is not None
     assert task.id == 1
     mock_db.query.return_value.filter.return_value.first.assert_called_once()
+
+
+def test_save_task():
+    mock_db = Mock()
+    repository = TaskRepository(mock_db)
+    repository.save_task(Task(
+        id=1,
+        title="title1",
+        description="description",
+        status="pending",
+        priority="low",
+        user_id=1
+    ))
+    mock_db.add.assert_called_once()
+    mock_db.commit.assert_called_once()
+    mock_db.refresh.assert_called_once()
