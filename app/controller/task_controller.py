@@ -53,9 +53,11 @@ def get_task_by_id(task_id: int, service: TaskService = Depends(get_task_service
 
 
 @task_router.put("/{task_id}", response_model=TaskResponse)
-def update_task(task_id: int, payload: UpdateTaskRequest, service: TaskService = Depends(get_task_service),
+def update_task(task_id: int, payload: UpdateTaskRequest,
+                background_tasks: BackgroundTasks,
+                service: TaskService = Depends(get_task_service),
                 user: User = Depends(get_current_user)):
-    task = service.update_task(task_id, payload, user.id)
+    task = service.update_task(task_id, payload, user.id, background_tasks)
     return task
 
 
