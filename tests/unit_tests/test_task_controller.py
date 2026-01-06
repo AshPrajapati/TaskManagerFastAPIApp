@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, ANY
 
 from starlette.testclient import TestClient
 
@@ -28,7 +28,8 @@ def test_create_task():
                            json=create_task_request.model_dump())
 
     assert response.status_code == 200
-    mock_service.create_task.assert_called_once_with(create_task_request, 1)
+
+    mock_service.create_task.assert_called_once_with(create_task_request, 1, ANY)
     app.dependency_overrides.clear()
 
 

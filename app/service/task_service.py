@@ -1,15 +1,19 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 
+from app.background_tasks.emailService import EmailService
 from app.repository.task_repository import TaskRepository
 from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest
 
 
 class TaskService:
-    def __init__(self, repository: TaskRepository):
+    def __init__(self, repository: TaskRepository, email_service: EmailService):
         self.repository = repository
+        self.email_service = email_service
 
-    def create_task(self, create_task_request: CreateTaskRequest, user_id) -> TaskResponse:
+    def create_task(self, create_task_request: CreateTaskRequest, user_id,
+                    background_tasks: BackgroundTasks) -> TaskResponse:
         task = self.repository.create_task(create_task_request, user_id)
+        background_tasks.add_task(self.email_service.send_email_on_task_created, task)
         return TaskResponse.model_validate(task)
 
     def get_all_tasks(self, user_id):

@@ -4,7 +4,9 @@ from fastapi import APIRouter
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
 from starlette import status
+from fastapi import BackgroundTasks
 
+from app.background_tasks.emailService import EmailService
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.model import User
@@ -19,15 +21,21 @@ def get_task_repository(db: Session = Depends(get_db)) -> TaskRepository:
     return TaskRepository(db=db)
 
 
-def get_task_service(repository: TaskRepository = Depends(get_task_repository)) -> TaskService:
-    return TaskService(repository=repository)
+def get_email_service():
+    return EmailService()
+
+
+def get_task_service(repository: TaskRepository = Depends(get_task_repository),
+                     email_service: EmailService = Depends(get_email_service)) -> TaskService:
+    return TaskService(repository=repository, email_service=email_service)
 
 
 @task_router.post("/", response_model=TaskResponse)
 def create_task(create_task_request: CreateTaskRequest,
+                background_tasks: BackgroundTasks,
                 service: TaskService = Depends(get_task_service),
                 user: User = Depends(get_current_user)):
-    task = service.create_task(create_task_request, user.id)
+    task = service.create_task(create_task_request, user.id, background_tasks)
     return task
 
 
