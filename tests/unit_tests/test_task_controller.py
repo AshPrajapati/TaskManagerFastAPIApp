@@ -5,7 +5,7 @@ from starlette.testclient import TestClient
 from app.controller.task_controller import get_task_service
 from app.core.security import get_current_user
 from app.main import app
-from app.schema.schema import TaskResponse, CreateTaskRequest
+from app.schema.schema import TaskResponse, CreateTaskRequest, PaginatedTasksResponse
 
 
 def test_create_task():
@@ -35,32 +35,31 @@ def test_create_task():
 
 def test_get_all_tasks():
     mock_service = Mock()
-    mock_service.get_all_tasks.return_value = [
-        TaskResponse(
-            task_id=1,
-            title="title",
-            description="description",
-            status="pending",
-            priority="low"
-        )
-        ,
-        TaskResponse(
-            task_id=2,
-            title="title2",
-            description="description2",
-            status="pending",
-            priority="medium"
-        )
-    ]
+    mock_service.get_all_tasks.return_value = PaginatedTasksResponse(
+        tasks=[
+            TaskResponse(task_id=1, title="title", description="description", status="pending", priority="high"),
+            TaskResponse(task_id=2, title="title2", description="description2", status="pending", priority="high"),
+            TaskResponse(task_id=3, title="title3", description="description3", status="pending", priority="high"),
+        ],
+        total=3,
+        page=1,
+        size=5,
+        total_pages=1
+    )
 
     setup_dependency_overrides(mock_service)
     client = TestClient(app)
     client.headers.update({"Authorization": f"Bearer access_token"})
 
-    response = client.get("/tasks")
+    response = client.get("/tasks?page=1&size=5&status=pending&priority=high")
 
     assert response.status_code == 200
-    assert len(response.json()) == 2
+    body = response.json()
+    assert body["total"] == 3
+    assert body["page"] == 1
+    assert body["size"] == 5
+    assert body["total_pages"] == 1
+    assert len(body["tasks"]) == 3
     mock_service.get_all_tasks.assert_called_once()
     app.dependency_overrides.clear()
 

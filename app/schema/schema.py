@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pydantic import BaseModel, Field
 
 
@@ -41,3 +43,34 @@ class UpdateTaskRequest(BaseModel):
     description: str | None = None
     status: str | None = None
     priority: str | None = None
+
+
+class PaginatedTasksResponse(BaseModel):
+    tasks: list[TaskResponse]
+    total: int
+    page: int
+    size: int
+    total_pages: int
+
+
+class TaskStatus(str, Enum):
+    pending = "pending"
+    in_progress = "in_progress"
+    completed = "completed"
+
+
+class TaskPriority(str, Enum):
+    low = "low"
+    medium = "medium"
+    high = "high"
+
+
+class TaskSortBy(str, Enum):
+    created_at = "created_at"
+    priority = "priority"
+    title = "title"
+
+
+class SortOrder(str, Enum):
+    asc = "asc"
+    desc = "desc"

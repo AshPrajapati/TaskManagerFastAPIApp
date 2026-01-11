@@ -5,7 +5,7 @@ import pytest
 from fastapi import HTTPException, BackgroundTasks
 
 from app.models.model import Task
-from app.schema.schema import CreateTaskRequest, UpdateTaskRequest
+from app.schema.schema import CreateTaskRequest, UpdateTaskRequest, TaskStatus, TaskPriority, TaskSortBy, SortOrder
 from app.service.task_service import TaskService
 
 
@@ -43,23 +43,37 @@ def test_create_task():
 def test_get_all_tasks():
     mock_repo = Mock()
     email_service = Mock()
-    mock_repo.get_all_tasks.return_value = [
-        Task(
-            id=1,
-            title="Test",
-            description="Desc",
-            status="pending",
-            priority="low",
-            user_id=1,
-            created_at=datetime.datetime.now(),
-            updated_at=datetime.datetime.now(),
-        )
-    ]
+    mock_repo.get_all_tasks.return_value = {
+        "tasks": [
+            {
+                "id": 1,
+                "title": "Test",
+                "description": "Desc",
+                "status": "pending",
+                "priority": "low",
+                "user_id": 1,
+                "created_at": datetime.datetime.now(),
+                "updated_at": datetime.datetime.now(),
+            }
+        ],
+        "total": 1,
+        "page": 1,
+        "size": 5,
+        "total_pages": 1
+    }
 
     service = TaskService(repository=mock_repo, email_service=email_service)
-    tasks = service.get_all_tasks(user_id=1)
-
-    assert len(tasks) == 1
+    response = service.get_all_tasks(user_id=1, page=1, size=5,
+                                     status=TaskStatus.pending,
+                                     priority=TaskPriority.low,
+                                     search="test",
+                                     sort_by=TaskSortBy.created_at,
+                                     order=SortOrder.desc)
+    assert response.total == 1
+    assert response.page == 1
+    assert response.size == 5
+    assert response.total_pages == 1
+    assert len(response.tasks) == 1
     mock_repo.get_all_tasks.assert_called_once()
 
 

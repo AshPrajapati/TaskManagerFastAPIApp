@@ -21,24 +21,26 @@ def test_create_task():
 
 
 def test_get_all_tasks():
+    mock_query = Mock()
     mock_db = Mock()
-    mock_db.query.return_value.filter.return_value.all.return_value = [
+    mock_query.filter.return_value = mock_query
+    mock_query.count.return_value = 2
+    mock_query.order_by.return_value = mock_query
+    mock_query.offset.return_value = mock_query
+    mock_query.limit.return_value = mock_query
+    mock_db.query.return_value = mock_query
+
+    mock_query.all.return_value = [
         Task(
-            id=1,
-            title="title1",
-            description="description",
-            status="pending",
-            priority="low",
+            id=1, title="title1", description="description",
+            status="pending", priority="low",
             created_at=datetime.datetime.now(),
             updated_at=datetime.datetime.now(),
             user_id=1
         ),
         Task(
-            id=2,
-            title="title2",
-            description="description",
-            status="pending",
-            priority="low",
+            id=2, title="title2", description="description",
+            status="pending", priority="low",
             created_at=datetime.datetime.now(),
             updated_at=datetime.datetime.now(),
             user_id=1
@@ -46,11 +48,24 @@ def test_get_all_tasks():
     ]
 
     repository = TaskRepository(mock_db)
-    tasks = repository.get_all_tasks(user_id=1)
+    response = repository.get_all_tasks(
+        user_id=1,
+        page=1,
+        size=10,
+        status=None,
+        priority=None,
+        search=None,
+        sort_by="created_at",
+        order="desc"
+    )
 
-    assert tasks is not None
-    assert len(tasks) == 2
-    mock_db.query.return_value.filter.return_value.all.assert_called_once()
+
+    assert response["total"] == 2
+    assert response["total_pages"] == 1
+    assert len(response["tasks"]) == 2
+    mock_db.query.assert_called_once_with(Task)
+    mock_query.filter.assert_called()
+    mock_query.all.assert_called_once()
 
 
 def test_get_task_by_id():

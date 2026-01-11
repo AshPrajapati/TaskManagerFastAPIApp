@@ -16,11 +16,31 @@ class TestTaskFlow:
         assert response.json()["status"] == "pending"
         assert response.json()["priority"] == "low"
 
-    def test_get_all_tasks(self, authenticated_client: TestClient, seeded_tasks):
-        response = authenticated_client.get("/tasks")
+    def test_get_tasks_with_filters_sort_and_pagination(self, authenticated_client: TestClient, seeded_tasks_get_all_tasks):
+        response = authenticated_client.get(
+            "/tasks?page=1&size=1&status=pending&priority=low&search=buy&sort_by=title&order=asc"
+        )
+
         assert response.status_code == 200
-        assert response.json() is not None
-        assert len(response.json()) == 2
+        data = response.json()
+        assert data["page"] == 1
+        assert data["size"] == 1
+        assert data["total"] == 2
+        assert data["total_pages"] == 2
+        assert data["tasks"][0]["title"] == "Buy groceries"
+
+    def test_get_tasks_second_page(self, authenticated_client, seeded_tasks_get_all_tasks):
+        response = authenticated_client.get(
+            "/tasks?page=2&size=1&status=pending&priority=low&search=buy&sort_by=title&order=asc"
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["page"] == 2
+        assert data["size"] == 1
+        assert data["total"] == 2
+        assert len(data["tasks"]) == 1
+        assert data["tasks"][0]["title"] == "Buy milk"
 
     def test_get_task_by_id(self, authenticated_client: TestClient, seeded_tasks):
         task_id = seeded_tasks[0]

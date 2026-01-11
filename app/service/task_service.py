@@ -3,7 +3,7 @@ from fastapi import HTTPException, BackgroundTasks
 from app.background_tasks.emailService import EmailService
 from app.models.model import Task
 from app.repository.task_repository import TaskRepository
-from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest
+from app.schema.schema import TaskResponse, CreateTaskRequest, UpdateTaskRequest, PaginatedTasksResponse
 
 
 class TaskService:
@@ -17,9 +17,26 @@ class TaskService:
         background_tasks.add_task(self.email_service.send_email_on_task_created, task)
         return TaskResponse.model_validate(task)
 
-    def get_all_tasks(self, user_id):
-        tasks = self.repository.get_all_tasks(user_id)
-        return [TaskResponse.model_validate(task) for task in tasks]
+    def get_all_tasks(self, user_id: int,
+                      page: int,
+                      size: int,
+                      status,
+                      priority,
+                      search,
+                      sort_by,
+                      order, ):
+        result = self.repository.get_all_tasks(user_id=user_id,
+                                               page=page,
+                                               size=size,
+                                               status=status.value if status else None,
+                                               priority=priority.value if priority else None,
+                                               search=search,
+                                               sort_by=sort_by.value,
+                                               order=order.value,
+                                               )
+        tasks = [TaskResponse.model_validate(task) for task in result['tasks']]
+        return PaginatedTasksResponse(tasks=tasks, total=result['total'], page=page, size=result['size'],
+                                      total_pages=result['total_pages'])
 
     def get_task_by_id(self, task_id, user_id):
         task = self.repository.get_task_by_id(task_id, user_id)

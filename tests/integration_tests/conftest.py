@@ -1,11 +1,11 @@
-from typing import Generator, Any
 import pytest
-from sqlalchemy.orm import sessionmaker, Session
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import sessionmaker
 
 from app.core.database import get_engine, Base, get_db
 from app.main import app
-from app.models.model import User
+from app.models.model import User, Task
+from app.schema.schema import TaskStatus, TaskPriority
 from tests.utils.auth import get_test_token
 
 
@@ -102,3 +102,40 @@ def seeded_tasks(authenticated_client):
                                                         "priority": "high", }
                                                   )
     return [task_one_response.json()["task_id"], task_two_response.json()["task_id"]]
+
+
+@pytest.fixture
+def seeded_tasks_get_all_tasks(db_session, get_test_user):
+    user = get_test_user
+    tasks = [
+        Task(
+            title="Buy milk",
+            description="desc1",
+            status=TaskStatus.pending.value,
+            priority=TaskPriority.low.value,
+            user_id=user.id
+        ),
+        Task(
+            title="Fix bugs",
+            description="desc2",
+            status=TaskStatus.in_progress.value,
+            priority=TaskPriority.high.value,
+            user_id=user.id
+        ),
+        Task(
+            title="Prepare meeting",
+            description="desc3",
+            status=TaskStatus.completed.value,
+            priority=TaskPriority.medium.value,
+            user_id=user.id
+        ),
+        Task(
+            title="Buy groceries",
+            description="desc4",
+            status=TaskStatus.pending.value,
+            priority=TaskPriority.low.value,
+            user_id=user.id
+        )
+    ]
+    db_session.add_all(tasks)
+    db_session.commit()
